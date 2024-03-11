@@ -1,14 +1,15 @@
 import rclpy
+from rclpy import Node
 import gym
 import numpy as np
 
 """
-simulator.py
+bipedal_simulator.py
 
 node that handles the simulation
 """
 
-class Box2DSim(Node):
+class BipedalSim(Node):
     def __init__(self):
         self.action_sub = rclpy.create_subscription(
             #Action_Message,
