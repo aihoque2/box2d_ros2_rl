@@ -25,13 +25,15 @@ class BipedalSim(Node):
         
         self.state_pub = rclpy.create_publisher(Float64MultiArray, "/state", 10)
         self.reward_pub = rclpy.create_publisher(Float64, "/reward", 10)
-        self.timer_period = 0.5 # seconds
-
+        
         self.env = gym.make("BipedalWalker-v3", render_mode="human")
         self.state_size = self.env.observation_space.shape[0]
         self.action_size = self.env.action_space
         self.state, info = self.env.reset()
-    
+
+        timer_period = 0.5 # seconds
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+
     def action_callback(self, msg: Float64MultiArray):
         """
         send the force message and update
@@ -43,11 +45,23 @@ class BipedalSim(Node):
         # TODO: do something with the reward and other vars
         self.state = new_state
         state_msg = Float64MultiArray(self.state)
+        reward = Float64(reward) # cast reward to ROS2 msg
+        self.reward_pub.publish(reward)
         self.state_pub.publish(state_msg)
 
         if terminated or truncated:
             state, info = self.env.reset()
             self.state = state
-            state_msg = Float64MultiArray(self.state)
             self.state_pub.publish(state_msg)
+
     
+    def timer_callback(self):
+        """
+        TODO: WTF IS A TIMER?
+
+        publishes the state and renders env
+        """
+        state_msg = Float64MultiArray(self.state)
+        self.state_pub.publish(state_msg)
+        self.env.render()
+
