@@ -10,7 +10,7 @@ class RandomActions(Node):
     def __init__(self):
         super().__init__("random_actions")
         self.action_pub = self.create_publisher(Float64MultiArray, "/action", 10)
-        timer_period = 0.025
+        timer_period = 0.017
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
     def timer_callback(self):
