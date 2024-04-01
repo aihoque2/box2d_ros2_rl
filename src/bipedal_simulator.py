@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 import rclpy
-from rclpy import Node
+from rclpy.node import Node
 import gymnasium as gym
 import numpy as np
 
@@ -25,6 +26,7 @@ class BipedalSim(Node):
     
         self.action_sub = self.create_subscription(
             # Action_Message,
+            Float64MultiArray,
             '/action',
             self.action_callback,
             10)
@@ -50,9 +52,9 @@ class BipedalSim(Node):
         
         # TODO: do something with the reward and other vars
         self.state = new_state
-        state_msg = Float64MultiArray(self.state)
-        reward = Float64(reward) # cast reward to ROS2 msg
-        self.reward_pub.publish(reward)
+        state_msg = Float64MultiArray(data=self.state)
+        reward_msg = Float64(data=reward) # cast reward to ROS2 msg
+        self.reward_pub.publish(reward_msg)
         self.state_pub.publish(state_msg)
 
         if terminated or truncated:
@@ -67,7 +69,15 @@ class BipedalSim(Node):
 
         publishes the state and renders env
         """
-        state_msg = Float64MultiArray(self.state)
+        state_msg = Float64MultiArray(data=self.state)
         self.state_pub.publish(state_msg)
         self.env.render()
 
+
+if __name__ == "__main__":
+    rclpy.init(args=None)
+
+    sim_node = BipedalSim()
+    rclpy.spin(sim_node)
+    
+    rclpy.shutdown()
