@@ -52,21 +52,22 @@ class BipedalSim(Node):
         
         # TODO: do something with the reward and other vars
         self.state = new_state
-        state_msg = Float64MultiArray(data=self.state)
         reward_msg = Float64(data=reward) # cast reward to ROS2 msg
         self.reward_pub.publish(reward_msg)
-        self.state_pub.publish(state_msg)
+
+        state_msg = Float64MultiArray(data=self.state) # needed for truncated case
+        # is this needed if timer_callback() publishes state?
+        # self.state_pub.publish(state_msg)
+        self.env.render()
 
         if terminated or truncated:
             state, info = self.env.reset()
             self.state = state
-            self.state_pub.publish(state_msg)
-
+            # self.state_pub.publish(state_msg)
+            self.end.render()
     
     def timer_callback(self):
         """
-        TODO: WTF IS A TIMER?
-
         publishes the state and renders env
         """
         state_msg = Float64MultiArray(data=self.state)
@@ -79,5 +80,5 @@ if __name__ == "__main__":
 
     sim_node = BipedalSim()
     rclpy.spin(sim_node)
-    
+
     rclpy.shutdown()

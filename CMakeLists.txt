@@ -24,6 +24,7 @@ install(
 
 # Python executable install
 install(PROGRAMS src/bipedal_simulator.py
+                src/random_axns.py
         DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
